@@ -1,0 +1,10 @@
+[server]
+Address="0.0.0.0:2863"
+LoggerLevel="INFO"
+
+[cloud]
+Address="localhost:9000"
+Username="minio-root"
+Password="minio-root"
+EnableSSL=false
+

@@ -1,0 +1,410 @@
+definitions:
+  httpserv.BadRequestForm:
+    properties:
+      message:
+        example: Bad Request message
+        type: string
+      status:
+        example: 400
+        type: integer
+    type: object
+  httpserv.CopyFileForm:
+    properties:
+      dst_path:
+        example: test-document.docx
+        type: string
+      src_path:
+        example: old-test-document.docx
+        type: string
+    type: object
+  httpserv.CreateBucketForm:
+    properties:
+      bucket_name:
+        example: test-bucket
+        type: string
+    type: object
+  httpserv.DownloadFileForm:
+    properties:
+      file_name:
+        example: test-file.docx
+        type: string
+    type: object
+  httpserv.GetFilesForm:
+    properties:
+      directory:
+        example: test-folder/
+        type: string
+    type: object
+  httpserv.RemoveFileForm:
+    properties:
+      file_name:
+        example: test-file.docx
+        type: string
+    type: object
+  httpserv.ResponseForm:
+    properties:
+      message:
+        example: Done
+        type: string
+      status:
+        example: 200
+        type: integer
+    type: object
+  httpserv.ServerErrorForm:
+    properties:
+      message:
+        example: Server Error message
+        type: string
+      status:
+        example: 503
+        type: integer
+    type: object
+  httpserv.ShareFileForm:
+    properties:
+      dir_path:
+        example: test-folder/
+        type: string
+      expired_secs:
+        example: 3600
+        type: integer
+      file_name:
+        example: test-file.docx
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /cloud/{bucket}:
+    delete:
+      description: Remove bucket from cloud
+      operationId: remove-bucket
+      parameters:
+      - description: Bucket name to remove
+        in: path
+        name: bucket
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok
+          schema:
+            $ref: '#/definitions/httpserv.ResponseForm'
+        "400":
+          description: Bad Request message
+          schema:
+            $ref: '#/definitions/httpserv.BadRequestForm'
+        "503":
+          description: Server does not available
+          schema:
+            $ref: '#/definitions/httpserv.ServerErrorForm'
+      summary: Remove bucket from cloud
+      tags:
+      - buckets
+  /cloud/{bucket}/file/copy:
+    post:
+      consumes:
+      - application/json
+      description: Copy file to another location into bucket
+      operationId: copy-file
+      parameters:
+      - description: Bucket name of src file
+        in: path
+        name: bucket
+        required: true
+        type: string
+      - description: Params to copy file
+        in: body
+        name: jsonQuery
+        required: true
+        schema:
+          $ref: '#/definitions/httpserv.CopyFileForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok
+          schema:
+            $ref: '#/definitions/httpserv.ResponseForm'
+        "400":
+          description: Bad Request message
+          schema:
+            $ref: '#/definitions/httpserv.BadRequestForm'
+        "503":
+          description: Server does not available
+          schema:
+            $ref: '#/definitions/httpserv.ServerErrorForm'
+      summary: Copy file to another location into bucket
+      tags:
+      - files
+  /cloud/{bucket}/file/download:
+    post:
+      consumes:
+      - application/json
+      description: Download file from cloud
+      operationId: download-file
+      parameters:
+      - description: Bucket name to download file
+        in: path
+        name: bucket
+        required: true
+        type: string
+      - description: Parameters to download file
+        in: body
+        name: jsonQuery
+        required: true
+        schema:
+          $ref: '#/definitions/httpserv.DownloadFileForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok
+          schema:
+            type: file
+        "400":
+          description: Bad Request message
+          schema:
+            $ref: '#/definitions/httpserv.BadRequestForm'
+        "503":
+          description: Server does not available
+          schema:
+            $ref: '#/definitions/httpserv.ServerErrorForm'
+      summary: Download file from cloud
+      tags:
+      - files
+  /cloud/{bucket}/file/move:
+    post:
+      consumes:
+      - application/json
+      description: Move file to another location into bucket
+      operationId: move-file
+      parameters:
+      - description: Bucket name of src file
+        in: path
+        name: bucket
+        required: true
+        type: string
+      - description: Params to move file
+        in: body
+        name: jsonQuery
+        required: true
+        schema:
+          $ref: '#/definitions/httpserv.CopyFileForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok
+          schema:
+            $ref: '#/definitions/httpserv.ResponseForm'
+        "400":
+          description: Bad Request message
+          schema:
+            $ref: '#/definitions/httpserv.BadRequestForm'
+        "503":
+          description: Server does not available
+          schema:
+            $ref: '#/definitions/httpserv.ServerErrorForm'
+      summary: Move file to another location into bucket
+      tags:
+      - files
+  /cloud/{bucket}/file/remove:
+    delete:
+      description: Remove file from cloud
+      operationId: remove-file
+      parameters:
+      - description: Bucket name to remove file
+        in: path
+        name: bucket
+        required: true
+        type: string
+      - description: Parameters to remove file
+        in: body
+        name: jsonQuery
+        required: true
+        schema:
+          $ref: '#/definitions/httpserv.RemoveFileForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok
+          schema:
+            $ref: '#/definitions/httpserv.ResponseForm'
+        "400":
+          description: Bad Request message
+          schema:
+            $ref: '#/definitions/httpserv.BadRequestForm'
+        "503":
+          description: Server does not available
+          schema:
+            $ref: '#/definitions/httpserv.ServerErrorForm'
+      summary: Remove file from cloud
+      tags:
+      - files
+  /cloud/{bucket}/file/share:
+    post:
+      consumes:
+      - application/json
+      description: Get share URL for file
+      operationId: share-file
+      parameters:
+      - description: Bucket name to share file
+        in: path
+        name: bucket
+        required: true
+        type: string
+      - description: Parameters to share file
+        in: body
+        name: jsonQuery
+        required: true
+        schema:
+          $ref: '#/definitions/httpserv.ShareFileForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok
+          schema:
+            $ref: '#/definitions/httpserv.ResponseForm'
+        "400":
+          description: Bad Request message
+          schema:
+            $ref: '#/definitions/httpserv.BadRequestForm'
+        "503":
+          description: Server does not available
+          schema:
+            $ref: '#/definitions/httpserv.ServerErrorForm'
+      summary: Get share URL for file
+      tags:
+      - share
+  /cloud/{bucket}/file/upload:
+    put:
+      consumes:
+      - multipart/form
+      description: Upload files to cloud
+      operationId: upload-files
+      parameters:
+      - description: Bucket name to upload files
+        in: path
+        name: bucket
+        required: true
+        type: string
+      - description: File datetime expired
+        in: query
+        name: expired
+        required: true
+        type: string
+      - description: Files multipart form
+        in: formData
+        name: files
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok
+          schema:
+            $ref: '#/definitions/httpserv.ResponseForm'
+        "400":
+          description: Bad Request message
+          schema:
+            $ref: '#/definitions/httpserv.BadRequestForm'
+        "503":
+          description: Server does not available
+          schema:
+            $ref: '#/definitions/httpserv.ServerErrorForm'
+      summary: Upload files to cloud
+      tags:
+      - files
+  /cloud/{bucket}/files:
+    post:
+      consumes:
+      - application/json
+      description: Get files list into bucket
+      operationId: get-list-files
+      parameters:
+      - description: Bucket name to get list files
+        in: path
+        name: bucket
+        required: true
+        type: string
+      - description: Parameters to get list files
+        in: body
+        name: jsonQuery
+        required: true
+        schema:
+          $ref: '#/definitions/httpserv.GetFilesForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok
+          schema:
+            $ref: '#/definitions/httpserv.ResponseForm'
+        "400":
+          description: Bad Request message
+          schema:
+            $ref: '#/definitions/httpserv.BadRequestForm'
+        "503":
+          description: Server does not available
+          schema:
+            $ref: '#/definitions/httpserv.ServerErrorForm'
+      summary: Get files list into bucket
+      tags:
+      - files
+  /cloud/bucket:
+    put:
+      consumes:
+      - application/json
+      description: Create new bucket into cloud
+      operationId: create-bucket
+      parameters:
+      - description: Bucket name to create
+        in: body
+        name: jsonQuery
+        required: true
+        schema:
+          $ref: '#/definitions/httpserv.CreateBucketForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok
+          schema:
+            $ref: '#/definitions/httpserv.ResponseForm'
+        "400":
+          description: Bad Request message
+          schema:
+            $ref: '#/definitions/httpserv.BadRequestForm'
+        "503":
+          description: Server does not available
+          schema:
+            $ref: '#/definitions/httpserv.ServerErrorForm'
+      summary: Create new bucket into cloud
+      tags:
+      - buckets
+  /cloud/buckets:
+    get:
+      description: Get watched bucket list
+      operationId: get-buckets
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok
+          schema:
+            items:
+              type: string
+            type: array
+        "503":
+          description: Server does not available
+          schema:
+            $ref: '#/definitions/httpserv.ServerErrorForm'
+      summary: Get watched bucket list
+      tags:
+      - buckets
+swagger: "2.0"
