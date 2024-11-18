@@ -24,7 +24,7 @@ func FromFile(filePath string) (*Config, error) {
 	viperInstance.AutomaticEnv()
 	viperInstance.SetConfigFile(filePath)
 
-	viperInstance.SetDefault("server.Address", "0.0.0.0:2866")
+	viperInstance.SetDefault("server.Address", "0.0.0.0:2863")
 	viperInstance.SetDefault("server.LoggerLevel", "INFO")
 
 	viperInstance.SetDefault("cloud.Address", "localhost:9000")

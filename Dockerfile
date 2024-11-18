@@ -19,4 +19,4 @@ RUN mkdir -p indexer && mkdir -p uploads
 
 ENTRYPOINT [ "/app/bin/docs-hub", "-e" ]
 
-EXPOSE 2866
+EXPOSE 2863
