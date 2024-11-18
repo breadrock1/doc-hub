@@ -7,4 +7,3 @@ Address="localhost:9000"
 Username="minio-root"
 Password="minio-root"
 EnableSSL=false
-
