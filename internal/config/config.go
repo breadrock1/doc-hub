@@ -50,8 +50,8 @@ func LoadEnv(enableDotenv bool) (*Config, error) {
 		_ = godotenv.Load()
 	}
 
-	servAddr := loadString("NEWS_WEEDER_SERVER_ADDRESS")
-	servLogger := loadString("NEWS_WEEDER_SERVER_LOGGER_LEVEL")
+	servAddr := loadString("DOCS_HUB_SERVER_ADDRESS")
+	servLogger := loadString("DOCS_HUB_SERVER_LOGGER_LEVEL")
 	serverConfig := server.Config{Address: servAddr, LoggerLevel: servLogger}
 
 	cloudAddr := loadString("DOCS_HUB_CLOUD_ADDRESS")
