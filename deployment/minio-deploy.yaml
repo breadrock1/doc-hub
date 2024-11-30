@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio-deploy
+  namespace: sova
+spec:
+  selector:
+    matchLabels:
+      app: minio
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+        - name: minio
+          image: minio/minio:latest
+          args:
+            - server
+            - --address
+            - ":9000"
+            - --console-address
+            - ":9001"
+            - /data
+          env:
+            - name: MINIO_ROOT_USER
+              value: "minio-root"
+            - name: MINIO_ROOT_PASSWORD
+              value: "minio-root"
+          ports:
+            - name: minio-api
+              containerPort: 9000
+            - name: minio-console
+              containerPort: 9001
+          volumeMounts:
+            - name: minio-vol
+              mountPath: "/data"
+      volumes:
+        - name: minio-vol
+          persistentVolumeClaim:
+            claimName: minio-pv-claim
