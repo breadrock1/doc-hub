@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: doc-hub-deploy
+  namespace: sova
+spec:
+  selector:
+    matchLabels:
+      app: doc-hub
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: doc-hub
+    spec:
+      containers:
+        - name: doc-hub
+          image: localhost:5000/local/doc-hub:latest
+          args:
+            - -e
+          env:
+            - name: DOCS_HUB_SERVER_ADDRESS
+              value: "0.0.0.0:2863"
+            - name: DOCS_HUB_SERVER_LOGGER_LEVEL
+              value: "INFO"
+            - name: DOCS_HUB_CLOUD_ADDRESS
+              value: "minio-service:9000"
+            - name: DOCS_HUB_CLOUD_USERNAME
+              value: "minio-root"
+            - name: DOCS_HUB_CLOUD_PASSWORD
+              value: "minio-root"
+            - name: DOCS_HUB_CLOUD_ENABLE_SSL
+              value: "false"
+          ports:
+            - name: doc-hub-api
+              containerPort: 2863
+      imagePullSecrets:
+        - name: regcred
