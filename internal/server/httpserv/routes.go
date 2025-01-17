@@ -172,7 +172,7 @@ func (s *ServerHttp) MoveFile(c echo.Context) error {
 // @Accept  multipart/form
 // @Produce  json
 // @Param bucket path string true "Bucket name to upload files"
-// @Param expired query string true "File datetime expired"
+// @Param expired query string false "File datetime expired like 2025-01-01T12:01:01Z"
 // @Param files formData file true "Files multipart form"
 // @Success 200 {object} ResponseForm "Ok"
 // @Failure	400 {object} BadRequestForm "Bad Request message"

@@ -292,10 +292,9 @@ paths:
         name: bucket
         required: true
         type: string
-      - description: File datetime expired
+      - description: File datetime expired like 2025-01-01T12:01:01Z
         in: query
         name: expired
-        required: true
         type: string
       - description: Files multipart form
         in: formData
