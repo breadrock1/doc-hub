@@ -425,10 +425,9 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "File datetime expired",
+                        "description": "File datetime expired like 2025-01-01T12:01:01Z",
                         "name": "expired",
-                        "in": "query",
-                        "required": true
+                        "in": "query"
                     },
                     {
                         "type": "file",
