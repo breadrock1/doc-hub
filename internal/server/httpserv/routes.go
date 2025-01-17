@@ -3,8 +3,9 @@ package httpserv
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
+	"fmt"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -42,7 +43,7 @@ func (s *ServerHttp) GetBuckets(c echo.Context) error {
 	ctx := c.Request().Context()
 	watcherDirs, err := s.cloud.Cloud.GetBuckets(ctx)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	return c.JSON(200, watcherDirs)
@@ -65,13 +66,13 @@ func (s *ServerHttp) CreateBucket(c echo.Context) error {
 	decoder := json.NewDecoder(c.Request().Body)
 	err := decoder.Decode(jsonForm)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	ctx := c.Request().Context()
 	err = s.cloud.Cloud.CreateBucket(ctx, jsonForm.BucketName)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	return c.JSON(200, createStatusResponse(200, "Ok"))
@@ -93,7 +94,7 @@ func (s *ServerHttp) RemoveBucket(c echo.Context) error {
 	ctx := c.Request().Context()
 	err := s.cloud.Cloud.RemoveBucket(ctx, bucket)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	return c.JSON(200, createStatusResponse(200, "Ok"))
@@ -119,13 +120,13 @@ func (s *ServerHttp) CopyFile(c echo.Context) error {
 	decoder := json.NewDecoder(c.Request().Body)
 	err := decoder.Decode(jsonForm)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	ctx := c.Request().Context()
 	err = s.cloud.Cloud.CopyFile(ctx, bucket, jsonForm.SrcPath, jsonForm.DstPath)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	return c.JSON(200, createStatusResponse(200, "Ok"))
@@ -151,13 +152,13 @@ func (s *ServerHttp) MoveFile(c echo.Context) error {
 	decoder := json.NewDecoder(c.Request().Body)
 	err := decoder.Decode(jsonForm)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	ctx := c.Request().Context()
 	err = s.cloud.Cloud.CopyFile(ctx, bucket, jsonForm.SrcPath, jsonForm.DstPath)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	return c.JSON(200, createStatusResponse(200, "Ok"))
@@ -182,7 +183,7 @@ func (s *ServerHttp) UploadFile(c echo.Context) error {
 
 	multipartForm, err := c.MultipartForm()
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	bucket := c.Param("bucket")
@@ -192,7 +193,8 @@ func (s *ServerHttp) UploadFile(c echo.Context) error {
 	}
 
 	if multipartForm.File["files"] == nil {
-		return errors.New("there are no files into multipart form")
+		err = fmt.Errorf("there are no files into multipart form")
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	expired := c.QueryParam("expired")
@@ -257,13 +259,13 @@ func (s *ServerHttp) DownloadFile(c echo.Context) error {
 	jsonForm := &DownloadFileForm{}
 	decoder := json.NewDecoder(c.Request().Body)
 	if err := decoder.Decode(jsonForm); err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	ctx := c.Request().Context()
 	fileData, err := s.cloud.Cloud.DownloadFile(ctx, bucket, jsonForm.FileName)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	defer fileData.Reset()
 
@@ -288,11 +290,15 @@ func (s *ServerHttp) RemoveFile(c echo.Context) error {
 	jsonForm := &RemoveFileForm{}
 	decoder := json.NewDecoder(c.Request().Body)
 	if err := decoder.Decode(jsonForm); err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	ctx := c.Request().Context()
-	return s.cloud.Cloud.RemoveFile(ctx, bucket, jsonForm.FileName)
+	if err := s.cloud.Cloud.RemoveFile(ctx, bucket, jsonForm.FileName); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	return c.JSON(200, createStatusResponse(200, "Ok"))
 }
 
 // GetFiles
@@ -315,13 +321,13 @@ func (s *ServerHttp) GetFiles(c echo.Context) error {
 	decoder := json.NewDecoder(c.Request().Body)
 	err := decoder.Decode(jsonForm)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	ctx := c.Request().Context()
 	listObjects, err := s.cloud.Cloud.GetFiles(ctx, bucket, jsonForm.DirectoryName)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	return c.JSON(200, listObjects)
@@ -347,7 +353,7 @@ func (s *ServerHttp) ShareFile(c echo.Context) error {
 	decoder := json.NewDecoder(c.Request().Body)
 	err := decoder.Decode(jsonForm)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	expired := time.Second * time.Duration(jsonForm.ExpiredSecs)
@@ -355,7 +361,7 @@ func (s *ServerHttp) ShareFile(c echo.Context) error {
 	ctx := c.Request().Context()
 	url, err := s.cloud.Cloud.GetShareURL(ctx, bucket, jsonForm.FileName, expired)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	return c.JSON(200, createStatusResponse(200, url))
