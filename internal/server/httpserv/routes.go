@@ -186,6 +186,11 @@ func (s *ServerHttp) UploadFile(c echo.Context) error {
 	}
 
 	bucket := c.Param("bucket")
+	if exist, err := s.cloud.Cloud.IsBucketExist(c.Request().Context(), bucket); err != nil || !exist {
+		retErr := fmt.Errorf("specified bucket %s does not exist", bucket)
+		return echo.NewHTTPError(http.StatusBadRequest, retErr.Error())
+	}
+
 	if multipartForm.File["files"] == nil {
 		return errors.New("there are no files into multipart form")
 	}

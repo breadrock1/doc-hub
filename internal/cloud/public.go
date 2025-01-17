@@ -21,6 +21,7 @@ type IBucket interface {
 	GetBuckets(ctx context.Context) ([]string, error)
 	CreateBucket(ctx context.Context, bucket string) error
 	RemoveBucket(ctx context.Context, bucket string) error
+	IsBucketExist(ctx context.Context, bucket string) (bool, error)
 }
 
 type IDocument interface {

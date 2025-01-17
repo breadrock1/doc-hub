@@ -59,6 +59,10 @@ func (mw *S3Minio) RemoveBucket(ctx context.Context, bucket string) error {
 	return mw.mc.RemoveBucket(ctx, bucket)
 }
 
+func (mw *S3Minio) IsBucketExist(ctx context.Context, bucket string) (bool, error) {
+	return mw.mc.BucketExists(ctx, bucket)
+}
+
 func (mw *S3Minio) GetFiles(ctx context.Context, bucket, filePath string) ([]*cloud.StorageItem, error) {
 	opts := minio.ListObjectsOptions{
 		UseV1:     true,
